@@ -33,20 +33,25 @@ func SetupRouter() *gin.Engine {
 	/**
 	路由分组
 	*/
+	router.LoadHTMLGlob("./templates/*")
+	router.Static("/statics", "./statics")
+	router.StaticFile("/favicon.ico", "./favicon.ico")
+
 	index := router.Group("/")
 	{
-		index.Any("", retHelloGinAndMethod)
+		index.GET("", handler.Index)
 	}
 
 	userRouter := router.Group("/user")
 	{
 		userRouter.GET("/:name", handler.UserSave)
 		userRouter.GET("", handler.UserSaveByQuery)
+		userRouter.POST("/register", handler.UserRegister)
 	}
-
 	return router
 }
 
 func retHelloGinAndMethod(context *gin.Context) {
+	//router.LoadHTMLGlob("templates/*")
 	context.String(http.StatusOK, "hello gin "+strings.ToLower(context.Request.Method)+" method")
 }
