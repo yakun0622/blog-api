@@ -1,0 +1,271 @@
+{{define "main"}}
+<head>
+    <script src="/statics/echarts/echarts.min.js"></script>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 100%;height:800px;"></div>
+<script type="text/javascript">
+
+    var myChart = echarts.init(document.getElementById('main'));
+    var upColor = '#ec0000';
+    var upBorderColor = '#8A0000';
+    var downColor = '#00da3c';
+    var downBorderColor = '#008F28';
+
+
+    // 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
+    // datas = [];
+    // var data0 = splitData(datas);
+
+
+    function splitData(rawData) {
+        var categoryData = [];
+        var values = []
+        for (var i = 0; i < rawData.length; i++) {
+            categoryData.push(rawData[i].splice(0, 1)[0]);
+            values.push(rawData[i])
+        }
+        console.log('categoryData.......')
+        console.log(categoryData)
+        return {
+            categoryData: categoryData,
+            values: values
+        };
+    }
+
+    function calculateMA(dayCount) {
+        var result = [];
+        for (var i = 0, len = data0.values.length; i < len; i++) {
+            if (i < dayCount) {
+                result.push('-');
+                continue;
+            }
+            var sum = 0;
+            for (var j = 0; j < dayCount; j++) {
+                sum += data0.values[i - j][1];
+            }
+            result.push(sum / dayCount);
+        }
+        return result;
+    }
+
+
+
+    option = {
+        title: {
+            text: '上证指数',
+            left: 0
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
+        legend: {
+            data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+        },
+        grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '15%'
+        },
+        xAxis: {
+            type: 'category',
+            // data: data0.categoryData,
+            data: [],
+            scale: true,
+            boundaryGap : false,
+            axisLine: {onZero: false},
+            splitLine: {show: false},
+            splitNumber: 20,
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            scale: true,
+            splitArea: {
+                show: true
+            }
+        },
+        dataZoom: [
+            {
+                type: 'inside',
+                start: 50,
+                end: 100
+            },
+            {
+                show: true,
+                type: 'slider',
+                y: '90%',
+                start: 50,
+                end: 100
+            }
+        ],
+        series: [
+            {
+                name: '日K',
+                type: 'candlestick',
+                // data: data0.values,
+                data: [],
+                itemStyle: {
+                    normal: {
+                        color: upColor,
+                        color0: downColor,
+                        borderColor: upBorderColor,
+                        borderColor0: downBorderColor
+                    }
+                },
+                markPoint: {
+                    label: {
+                        normal: {
+                            formatter: function (param) {
+                                return param != null ? Math.round(param.value) : '';
+                            }
+                        }
+                    },
+                    data: [
+                        {
+                            name: 'XX标点',
+                            coord: ['2013/5/31', 2300],
+                            value: 2300,
+                            itemStyle: {
+                                normal: {color: 'rgb(41,60,85)'}
+                            }
+                        },
+                        {
+                            name: 'highest value',
+                            type: 'max',
+                            valueDim: 'highest'
+                        },
+                        {
+                            name: 'lowest value',
+                            type: 'min',
+                            valueDim: 'lowest'
+                        },
+                        {
+                            name: 'average value on close',
+                            type: 'average',
+                            valueDim: 'close'
+                        }
+                    ],
+                    tooltip: {
+                        formatter: function (param) {
+                            return param.name + '<br>' + (param.data.coord || '');
+                        }
+                    }
+                },
+                markLine: {
+                    symbol: ['none', 'none'],
+                    data: [
+                        [
+                            {
+                                name: 'from lowest to highest',
+                                type: 'min',
+                                valueDim: 'lowest',
+                                symbol: 'circle',
+                                symbolSize: 10,
+                                label: {
+                                    normal: {show: false},
+                                    emphasis: {show: false}
+                                }
+                            },
+                            {
+                                type: 'max',
+                                valueDim: 'highest',
+                                symbol: 'circle',
+                                symbolSize: 10,
+                                label: {
+                                    normal: {show: false},
+                                    emphasis: {show: false}
+                                }
+                            }
+                        ],
+                        {
+                            name: 'min line on close',
+                            type: 'min',
+                            valueDim: 'close'
+                        },
+                        {
+                            name: 'max line on close',
+                            type: 'max',
+                            valueDim: 'close'
+                        }
+                    ]
+                }
+            },
+            // {
+            //     name: 'MA5',
+            //     type: 'line',
+            //     data: calculateMA(5),
+            //     smooth: true,
+            //     lineStyle: {
+            //         normal: {opacity: 0.5}
+            //     }
+            // },
+            // {
+            //     name: 'MA10',
+            //     type: 'line',
+            //     data: calculateMA(10),
+            //     smooth: true,
+            //     lineStyle: {
+            //         normal: {opacity: 0.5}
+            //     }
+            // },
+            // {
+            //     name: 'MA20',
+            //     type: 'line',
+            //     data: calculateMA(20),
+            //     smooth: true,
+            //     lineStyle: {
+            //         normal: {opacity: 0.5}
+            //     }
+            // },
+            // {
+            //     name: 'MA30',
+            //     type: 'line',
+            //     data: calculateMA(30),
+            //     smooth: true,
+            //     lineStyle: {
+            //         normal: {opacity: 0.5}
+            //     }
+            // },
+
+        ]
+    };
+    myChart.setOption(option);
+    myChart.showLoading();    //数据加载完之前先显示一段简单的loading动画
+    $.ajax({
+        url: '/btc_usd/list',
+        dataType : "json",
+        success: function (resp) {
+            var list = resp.btc_usd_array
+            if (list) {
+                res_data = list
+                var data0 = splitData(res_data);
+                myChart.setOption({        //载入数据
+                    xAxis: [{
+                        data: data0.categoryData    //填入X轴数据
+                    },{
+                        data: data0.categoryData    //填入X轴数据
+                    }],
+                    series: [    //填入系列（内容）数据
+                        {
+                            // 根据名字对应到相应的系列
+                            name: '15m',
+                            data: data0.values
+                        }
+                    ]
+                });
+                myChart.hideLoading();    //隐藏加载动画
+            }
+
+        }
+    })
+    $(function () {
+
+    })
+</script>
+</body>
+{{end}}
